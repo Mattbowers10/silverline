@@ -30,6 +30,7 @@ const PARENT_ONLY_PREFIXES = [
   "/blog",
   "/shop",
   "/legal",
+  "/service-area",
 ];
 
 function isParentOnly(path: string) {

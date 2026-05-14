@@ -13,3 +13,4 @@ export { FAQ } from "./FAQ";
 export { RecentPosts } from "./RecentPosts";
 export { ProjectGallery } from "./ProjectGallery";
 export { CTABand } from "./CTABand";
+export { FeatureList } from "./FeatureList";
