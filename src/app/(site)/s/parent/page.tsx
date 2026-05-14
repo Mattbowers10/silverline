@@ -14,6 +14,15 @@ import {
   ProjectGallery,
   CTABand,
 } from "@/components/sections";
+import { HeroComposite } from "@/components/site/HeroComposite";
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata = buildMetadata({
+  title: "Silverline — Custom Homes, Pools, and Properties in East Tennessee",
+  description:
+    "Silverline builds custom luxury homes, custom pools, and manages East Tennessee properties. One team. One standard. 85+ years of combined craftsmanship.",
+  path: "/",
+});
 
 /**
  * Parent home page — silverlineind.com
@@ -35,6 +44,7 @@ export default function ParentHome() {
           submitLabel: "Request consultation",
         }}
         secondaryLink={{ label: "Or see our work", href: "/projects" }}
+        heroSlot={<HeroComposite />}
         metric={{
           value: "85+",
           label: "years of combined craftsmanship across our team",
@@ -356,42 +366,36 @@ export default function ParentHome() {
             division: "developments",
             city: "Loudon",
             href: "/projects/tellico-estate",
-            image: { src: "/window.svg", alt: "" },
           },
           {
             title: "Gunite pool & spa, Northshore",
             division: "pools",
             city: "Farragut",
             href: "/projects/northshore-pool",
-            image: { src: "/window.svg", alt: "" },
           },
           {
             title: "Mountain rental remodel",
             division: "properties",
             city: "Sevierville",
             href: "/projects/sevier-str",
-            image: { src: "/window.svg", alt: "" },
           },
           {
             title: "Commercial fit-out",
             division: "developments",
             city: "Knoxville",
             href: "/projects/west-knox-commercial",
-            image: { src: "/window.svg", alt: "" },
           },
           {
             title: "Fiberglass pool install",
             division: "pools",
             city: "Maryville",
             href: "/projects/maryville-fiberglass",
-            image: { src: "/window.svg", alt: "" },
           },
           {
             title: "STR portfolio onboarding",
             division: "properties",
             city: "Pigeon Forge",
             href: "/projects/pigeon-forge-portfolio",
-            image: { src: "/window.svg", alt: "" },
           },
         ]}
       />

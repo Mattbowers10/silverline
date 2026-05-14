@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { SectionHeader } from "./SectionHeader";
+import { PlaceholderArt } from "@/components/site/PlaceholderArt";
 
 type Card = {
   label: string;
@@ -35,7 +36,7 @@ export function ForWho({ eyebrow, headline, italicWord, sub, cards }: Props) {
 
         <div className="-mx-6 mt-12 overflow-x-auto pb-4 [scrollbar-width:thin]">
           <ul className="flex w-max gap-6 px-6">
-            {cards.map((c) => (
+            {cards.map((c, i) => (
               <li
                 key={c.label}
                 className="relative h-[420px] w-[300px] shrink-0 snap-start overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-panel)]"
@@ -48,7 +49,12 @@ export function ForWho({ eyebrow, headline, italicWord, sub, cards }: Props) {
                     sizes="300px"
                     className="object-cover opacity-90 transition-opacity duration-300 hover:opacity-100"
                   />
-                ) : null}
+                ) : (
+                  <PlaceholderArt
+                    kind={["landscape", "house", "pool"][i % 3] as "landscape" | "house" | "pool"}
+                    seed={i + 1}
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute inset-x-6 bottom-6">
                   <p className="font-display text-[length:var(--text-24)] leading-tight tracking-tight text-white">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/cn";
 import { SectionHeader } from "./SectionHeader";
+import { PlaceholderArt } from "@/components/site/PlaceholderArt";
 
 type Project = {
   title: string;
@@ -9,8 +10,14 @@ type Project = {
   /** Division tag — drives the accent color/label */
   division: "pools" | "developments" | "properties";
   city?: string;
-  image: { src: string; alt: string };
+  image?: { src: string; alt: string };
 };
+
+const KIND_BY_DIVISION = {
+  pools: "pool",
+  developments: "house",
+  properties: "landscape",
+} as const;
 
 type Props = {
   eyebrow?: string;
@@ -71,13 +78,20 @@ export function ProjectGallery({
                 )}
               >
                 <Link href={p.href} className="group block h-full w-full">
-                  <Image
-                    src={p.image.src}
-                    alt={p.image.alt}
-                    fill
-                    sizes={wide ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 33vw"}
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
+                  {p.image ? (
+                    <Image
+                      src={p.image.src}
+                      alt={p.image.alt}
+                      fill
+                      sizes={wide ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 33vw"}
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <PlaceholderArt
+                      kind={KIND_BY_DIVISION[p.division]}
+                      seed={i + 1}
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
                   <div className="absolute inset-x-6 bottom-6">
                     <p className="text-[length:var(--text-13)] uppercase tracking-[0.22em] text-[var(--color-accent)]">

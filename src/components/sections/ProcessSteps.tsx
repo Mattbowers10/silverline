@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { SectionHeader } from "./SectionHeader";
+import { PlaceholderArt } from "@/components/site/PlaceholderArt";
 
 type Step = {
   step: string;
@@ -32,7 +33,7 @@ export function ProcessSteps({ eyebrow, headline, italicWord, sub, steps }: Prop
         />
 
         <ul className="mt-16 grid gap-6 md:grid-cols-3">
-          {steps.map((s) => (
+          {steps.map((s, i) => (
             <li
               key={s.step}
               className="card-highlight flex flex-col overflow-hidden rounded-2xl border border-[var(--color-line)]"
@@ -46,7 +47,12 @@ export function ProcessSteps({ eyebrow, headline, italicWord, sub, steps }: Prop
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover"
                   />
-                ) : null}
+                ) : (
+                  <PlaceholderArt
+                    kind={i === 0 ? "landscape" : i === 1 ? "house" : "tool"}
+                    seed={i + 1}
+                  />
+                )}
               </div>
               <div className="flex flex-1 flex-col p-7">
                 <span className="text-[length:var(--text-13)] uppercase tracking-[0.22em] text-[var(--color-accent)]">

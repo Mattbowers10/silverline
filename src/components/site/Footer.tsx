@@ -3,13 +3,18 @@ import type { Tenant } from "@/lib/tenants";
 
 type Column = { heading: string; links: { label: string; href: string }[] };
 
+/**
+ * NOTE: Company pages (about, careers, contact, legal, etc.) live ONLY on the
+ * parent domain. The proxy redirects any request to those paths from a
+ * subdomain back to the parent, so we use relative URLs here.
+ */
 const COMMON_COMPANY: Column = {
   heading: "Company",
   links: [
     { label: "About", href: "/about" },
     { label: "Careers", href: "/careers" },
     { label: "Contact", href: "/contact" },
-    { label: "Blog", href: "https://silverlineind.com/blog" },
+    { label: "Blog", href: "/blog" },
   ],
 };
 
@@ -28,7 +33,7 @@ const COMMON_RESOURCES: Column = {
     { label: "Service area", href: "/service-area" },
     { label: "Financing", href: "/financing" },
     { label: "Testimonials", href: "/testimonials" },
-    { label: "Shop", href: "https://silverlineind.com/shop" },
+    { label: "Shop", href: "/shop" },
   ],
 };
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SectionHeader } from "./SectionHeader";
+import { PlaceholderArt } from "@/components/site/PlaceholderArt";
 
 type Card = {
   /** Division accent label, e.g., "Pools" */
@@ -11,6 +12,8 @@ type Card = {
   /** External target (subdomain) — opens in same tab but marks rel */
   external?: boolean;
   image?: { src: string; alt: string };
+  /** Placeholder art kind to render when no image is provided */
+  placeholderKind?: "pool" | "house" | "landscape";
 };
 
 type Props = {
@@ -38,15 +41,15 @@ export function DivisionCards({ eyebrow, headline, italicWord, sub, cards }: Pro
         />
 
         <ul className="mt-16 grid gap-6 md:grid-cols-3">
-          {cards.map((c) => (
+          {cards.map((c, i) => (
             <li key={c.tag} className="group">
               <Link
                 href={c.href}
                 {...(c.external ? { rel: "noopener", target: "_self" } : {})}
                 className="card-highlight flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--color-line)] transition-colors hover:border-[var(--color-accent)]/40"
               >
-                {c.image ? (
-                  <div className="relative aspect-[4/3] overflow-hidden">
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  {c.image ? (
                     <Image
                       src={c.image.src}
                       alt={c.image.alt}
@@ -54,8 +57,13 @@ export function DivisionCards({ eyebrow, headline, italicWord, sub, cards }: Pro
                       sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                  </div>
-                ) : null}
+                  ) : (
+                    <PlaceholderArt
+                      kind={c.placeholderKind ?? "house"}
+                      seed={i + 1}
+                    />
+                  )}
+                </div>
                 <div className="flex flex-1 flex-col p-7">
                   <span className="text-[length:var(--text-13)] uppercase tracking-[0.22em] text-[var(--color-accent)]">
                     {c.tag}

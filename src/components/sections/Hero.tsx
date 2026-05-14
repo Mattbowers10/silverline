@@ -20,6 +20,8 @@ type Props = {
   secondaryLink?: { label: string; href: string };
   /** Optional hero composite image */
   heroImage?: { src: string; alt: string };
+  /** Optional JSX slot for a custom hero visual (overrides heroImage) */
+  heroSlot?: React.ReactNode;
   /** Optional impact stat ($X spent / X projects completed) */
   metric?: { value: string; label: string };
   /** Optional infinite logo marquee of partners/customers */
@@ -35,6 +37,7 @@ export function Hero({
   emailCapture,
   secondaryLink,
   heroImage,
+  heroSlot,
   metric,
   logos,
   className,
@@ -110,8 +113,10 @@ export function Hero({
             ) : null}
           </div>
 
-          {/* Visual column */}
-          {heroImage ? (
+          {/* Visual column — JSX slot takes precedence over image */}
+          {heroSlot ? (
+            <div className="relative lg:col-span-6">{heroSlot}</div>
+          ) : heroImage ? (
             <div className="relative lg:col-span-6">
               <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-panel)]">
                 <Image

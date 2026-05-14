@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SectionHeader } from "./SectionHeader";
+import { PlaceholderArt } from "@/components/site/PlaceholderArt";
 
 type Post = {
   title: string;
@@ -52,7 +53,7 @@ export function RecentPosts({
 
         <div className="-mx-6 mt-12 overflow-x-auto pb-4 [scrollbar-width:thin]">
           <ul className="flex w-max gap-6 px-6">
-            {posts.map((p) => (
+            {posts.map((p, i) => (
               <li key={p.href} className="w-[340px] shrink-0 snap-start md:w-[400px]">
                 <Link
                   href={p.href}
@@ -67,7 +68,12 @@ export function RecentPosts({
                         sizes="400px"
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                    ) : null}
+                    ) : (
+                      <PlaceholderArt
+                        kind={["pool", "house", "landscape", "tool"][i % 4] as "pool" | "house" | "landscape" | "tool"}
+                        seed={i + 1}
+                      />
+                    )}
                   </div>
                   <div className="flex flex-1 flex-col p-6">
                     <div className="flex items-center gap-3 text-[length:var(--text-13)] uppercase tracking-[0.18em] text-[var(--color-muted)]">

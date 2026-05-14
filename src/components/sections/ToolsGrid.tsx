@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SectionHeader } from "./SectionHeader";
+import { PlaceholderArt } from "@/components/site/PlaceholderArt";
 
 type Tool = {
   name: string;
@@ -35,7 +36,7 @@ export function ToolsGrid({ eyebrow, headline, italicWord, sub, tools }: Props) 
         />
 
         <ul className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {tools.map((t) => (
+          {tools.map((t, i) => (
             <li key={t.name}>
               <Link
                 href={t.href}
@@ -50,7 +51,9 @@ export function ToolsGrid({ eyebrow, headline, italicWord, sub, tools }: Props) 
                       sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover"
                     />
-                  ) : null}
+                  ) : (
+                    <PlaceholderArt kind="tool" seed={i + 1} />
+                  )}
                   {t.badge ? (
                     <span className="absolute left-4 top-4 rounded-full bg-[var(--color-accent)]/15 px-3 py-1 text-[length:var(--text-13)] text-[var(--color-accent)]">
                       {t.badge}
