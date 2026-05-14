@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { tenantFromHost } from "@/lib/tenants";
 
 /**
- * Subdomain routing (Next 16 "proxy" — the renamed middleware).
+ * Subdomain routing.
  *
  *  - silverlineind.com               → app/s/parent/...
  *  - pools.silverlineind.com         → app/s/pools/...
