@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+/* ----------------------------------------------------------
+   Silverline design tokens — Tailwind v4 (@theme directive)
+   - bg-page         #040406  near-black
+   - bg-panel        #0B0C0E  card / footer panel
+   - accent          #82d8f9  used sparingly (italic display word,
+                              link hover, active states, badges)
+   - text-primary    #FFFFFF
+   - text-muted      #A1A1AA  body sub copy
+   - text-faint      #6B7280  legal / fine print
+   - border-line     #1B1B20  hairline borders on cards
+---------------------------------------------------------- */
+
+:root {
+  --color-page: #040406;
+  --color-panel: #0b0c0e;
+  --color-accent: #82d8f9;
+  --color-accent-soft: #a4e2fa;
+  --color-text: #ffffff;
+  --color-muted: #a1a1aa;
+  --color-faint: #6b7280;
+  --color-line: #1b1b20;
+}
+
+@theme inline {
+  --color-page: var(--color-page);
+  --color-panel: var(--color-panel);
+  --color-accent: var(--color-accent);
+  --color-accent-soft: var(--color-accent-soft);
+  --color-text: var(--color-text);
+  --color-muted: var(--color-muted);
+  --color-faint: var(--color-faint);
+  --color-line: var(--color-line);
+
+  --font-display: var(--font-caudex);
+  --font-sans: var(--font-inter);
+
+  /* type scale matching Slash */
+  --text-13: 0.8125rem;
+  --text-15: 0.9375rem;
+  --text-16: 1rem;
+  --text-18: 1.125rem;
+  --text-20: 1.25rem;
+  --text-24: 1.5rem;
+  --text-32: 2rem;
+  --text-40: 2.5rem;
+  --text-48: 3rem;
+  --text-52: 3.25rem;
+  --text-64: 4rem;
+}
+
+html,
+body {
+  background: var(--color-page);
+  color: var(--color-text);
+}
+
+body {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv11", "ss01", "ss03";
+}
+
+/* Editorial italic display headings */
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+/* Marquee animation for hero / partner logo strips */
+@keyframes marqueeScroll {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+.animate-marquee {
+  animation: marqueeScroll 45s linear infinite;
+}
+
+/* Radix accordion animations (shadcn pattern) */
+@keyframes accordion-down {
+  from { height: 0; }
+  to   { height: var(--radix-accordion-content-height); }
+}
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to   { height: 0; }
+}
+.animate-accordion-down { animation: accordion-down 0.2s ease-out; }
+.animate-accordion-up   { animation: accordion-up   0.2s ease-out; }
+
+/* Subtle radial highlight used on card tops (matches Slash) */
+.card-highlight {
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(255,255,255,0.04), transparent 60%),
+    var(--color-panel);
+}
+
+/* Selection */
+::selection { background: var(--color-accent); color: #000; }
