@@ -5,15 +5,15 @@ import { postgresAdapter } from "@payloadcms/db-postgres";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import sharp from "sharp";
 
-import { Users } from "@/payload/collections/Users";
-import { Media } from "@/payload/collections/Media";
-import { Posts } from "@/payload/collections/Posts";
-import { Projects } from "@/payload/collections/Projects";
-import { Testimonials } from "@/payload/collections/Testimonials";
-import { Team } from "@/payload/collections/Team";
-import { Products } from "@/payload/collections/Products";
-import { Pages } from "@/payload/collections/Pages";
-import { Leads } from "@/payload/collections/Leads";
+import { Users } from "./payload/collections/Users.js";
+import { Media } from "./payload/collections/Media.js";
+import { Posts } from "./payload/collections/Posts.js";
+import { Projects } from "./payload/collections/Projects.js";
+import { Testimonials } from "./payload/collections/Testimonials.js";
+import { Team } from "./payload/collections/Team.js";
+import { Products } from "./payload/collections/Products.js";
+import { Pages } from "./payload/collections/Pages.js";
+import { Leads } from "./payload/collections/Leads.js";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
