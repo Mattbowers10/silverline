@@ -61,11 +61,13 @@ export function proxy(req: NextRequest) {
   const path = url.pathname;
 
   // Don't rewrite already-internal paths (`/s/<tenant>/…`), Payload routes,
-  // static assets, or Next internals. Crawlers that hit Next-generated URLs
-  // like `/s/parent/opengraph-image-…` must pass through unchanged.
+  // the operations dashboard, static assets, or Next internals. Crawlers that
+  // hit Next-generated URLs like `/s/parent/opengraph-image-…` must pass
+  // through unchanged.
   const passThrough =
     path.startsWith("/s/") ||
     path.startsWith("/admin") ||
+    path.startsWith("/dashboard") ||
     path.startsWith("/api/") ||
     path.startsWith("/_next") ||
     path.startsWith("/media") ||
