@@ -15,6 +15,7 @@ export function NewsletterForm() {
     setError("");
     const fd = new FormData(e.currentTarget);
     const email = String(fd.get("email") ?? "").trim();
+    const website = String(fd.get("website") ?? ""); // honeypot
     if (!email) {
       setError("Enter your email.");
       setStatus("error");
@@ -29,6 +30,7 @@ export function NewsletterForm() {
           name: email.split("@")[0] || "Subscriber",
           email,
           source: "newsletter",
+          website,
         }),
       });
       const data = await res.json();
@@ -62,6 +64,26 @@ export function NewsletterForm() {
       onSubmit={handleSubmit}
       className="mx-auto mt-6 flex max-w-md items-center rounded-full border border-[var(--color-line)] bg-[var(--color-page)] p-1"
     >
+      {/* Honeypot — invisible to humans. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          left: "-10000px",
+          width: 1,
+          height: 1,
+          overflow: "hidden",
+        }}
+      >
+        <label htmlFor="newsletter-website-trap">Website (leave blank)</label>
+        <input
+          id="newsletter-website-trap"
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
       <label htmlFor="newsletter-email" className="sr-only">
         Email address
       </label>

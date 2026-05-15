@@ -67,6 +67,13 @@ export default async function LeadsListPage({ searchParams }: Args) {
             page {result.page} of {Math.max(1, result.totalPages)}
           </p>
         </div>
+        <a
+          href={`/api/leads/export${toQuery({ ...sp, page: undefined })}`}
+          className="rounded-full border border-[var(--color-line)] px-4 py-2 text-[length:var(--text-13)] text-[var(--color-text)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+          download
+        >
+          Export CSV ↓
+        </a>
       </header>
 
       {/* Pipeline rollup */}

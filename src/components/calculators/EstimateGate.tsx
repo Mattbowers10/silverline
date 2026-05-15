@@ -44,6 +44,7 @@ export function EstimateGate({ preview, result, source, division, cta }: Props) 
       zip: String(fd.get("zip") ?? "").trim() || undefined,
       division,
       source,
+      website: String(fd.get("website") ?? ""), // honeypot
     };
 
     try {
@@ -108,6 +109,26 @@ export function EstimateGate({ preview, result, source, division, cta }: Props) 
 
       {!unlocked ? (
         <form onSubmit={handleUnlock} className="mt-6 space-y-3">
+          {/* Honeypot — invisible to humans. */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              left: "-10000px",
+              width: 1,
+              height: 1,
+              overflow: "hidden",
+            }}
+          >
+            <label htmlFor={`gate-website-${source}`}>Website (leave blank)</label>
+            <input
+              id={`gate-website-${source}`}
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
           <p className="text-[length:var(--text-15)] text-[var(--color-muted)]">
             Drop your email and we&apos;ll unlock the full estimate.
           </p>

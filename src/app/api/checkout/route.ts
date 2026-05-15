@@ -1,17 +1,29 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { getProduct } from "@/lib/products";
+import { rateLimit, rateLimitHeaders } from "@/lib/rateLimit";
 
 type IncomingItem = { slug?: string; quantity?: number };
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
 
+const LIMIT = 10; // checkout starts per minute per IP
+const WINDOW_SEC = 60;
+
 export async function POST(req: NextRequest) {
+  const rl = rateLimit(req, { limit: LIMIT, windowSec: WINDOW_SEC, namespace: "checkout" });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { ok: false, error: "Too many checkout attempts. Try again in a minute." },
+      { status: 429, headers: rateLimitHeaders(rl, LIMIT) },
+    );
+  }
+
   const stripe = getStripe();
   if (!stripe) {
     return NextResponse.json(
       { ok: false, error: "Stripe is not configured in this environment." },
-      { status: 503 },
+      { status: 503, headers: rateLimitHeaders(rl, LIMIT) },
     );
   }
 
@@ -69,14 +81,16 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ ok: true, id: session.id, url: session.url });
-  } catch (err) {
     return NextResponse.json(
-      {
-        ok: false,
-        error: `Stripe error: ${(err as Error).message}`,
-      },
-      { status: 502 },
+      { ok: true, id: session.id, url: session.url },
+      { headers: rateLimitHeaders(rl, LIMIT) },
+    );
+  } catch (err) {
+    // Log the real reason server-side; return a safe generic message to the client.
+    console.error("[checkout] Stripe session creation failed:", (err as Error).message);
+    return NextResponse.json(
+      { ok: false, error: "Couldn't start checkout. Please try again." },
+      { status: 502, headers: rateLimitHeaders(rl, LIMIT) },
     );
   }
 }

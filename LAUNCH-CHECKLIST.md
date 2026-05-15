@@ -302,6 +302,97 @@ shows the "Calendly slot — set NEXT_PUBLIC_CALENDLY_URL" placeholder.
 
 ---
 
+## 10b. 🟢 Security, privacy, abuse
+
+Items below are either applied in code (✅) or still on you to wire (🔲).
+
+### Already applied in code
+- ✅ **Rate limits** on every public-facing API:
+  `/api/leads` 5/min/IP · `/api/checkout` 10/min/IP. Returns `429` with
+  `Retry-After`. `src/lib/rateLimit.ts` is the swap point for Upstash
+  Redis when traffic warrants distributed counters.
+- ✅ **Honeypot** anti-bot field on every public lead form
+  (`ConsultationForm`, `NewsletterForm`, calculator `EstimateGate`).
+  Bots that fill the hidden `website` input get a fake success and never
+  reach Payload / GHL / Resend.
+- ✅ **Security headers** via `next.config.ts` on every response:
+  HSTS (2y, includeSubDomains, preload) · X-Content-Type-Options nosniff ·
+  X-Frame-Options SAMEORIGIN · Referrer-Policy strict-origin-when-cross-origin ·
+  Permissions-Policy lock-down for camera/microphone/geolocation/interest-cohort ·
+  X-XSS-Protection: 0
+- ✅ **Server-only secrets**: every sensitive key (`PAYLOAD_SECRET`,
+  `DATABASE_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+  `GHL_API_KEY`, `GHL_LOCATION_ID`, `RESEND_API_KEY`) is read only inside
+  server modules. The only `NEXT_PUBLIC_*` Stripe key is the *publishable*
+  key (designed to be public).
+- ✅ **Input validation**: `lib/leads.ts` validates every submission with
+  zod (strips unknown fields, rejects malformed). Bad input returns
+  structured `400` with field-level error messages — no stack traces.
+- ✅ **Stripe error sanitization**: `/api/checkout` logs full Stripe error
+  server-side, returns generic `"Couldn't start checkout"` to the client.
+- ✅ **Server-side price re-resolution** at checkout: every cart-line slug
+  is re-resolved to a real `stripePriceId` from Payload before the Stripe
+  Checkout Session is created. Clients can't tamper with prices.
+- ✅ **Stripe webhook signature verification** via
+  `stripe.webhooks.constructEvent` — rejected with `400` if the signing
+  secret doesn't match.
+- ✅ **Payload session cookie**: `payload-token` is HttpOnly + SameSite by
+  default — JS in the browser cannot read it.
+- ✅ **Dashboard auth gate**: every `/dashboard/*` page calls
+  `requireUser()` which 307-redirects unauthenticated requests to
+  `/admin/login?redirect=<original>`.
+- ✅ **CORS allow-list** in Payload config — only the four production
+  hostnames can hit the Payload REST/GraphQL APIs from a browser.
+- ✅ **robots.txt** disallows `/admin` and `/api`. `/dashboard` is
+  `noindex` via metadata.
+- ✅ **SQL injection**: Payload's Postgres adapter parameterizes every
+  query — no raw SQL strings concatenated anywhere in our code.
+
+### Pre-launch tasks for you
+- 🔲 **Privacy policy** — `/legal/privacy` is currently a stub. Have
+  counsel finalize the real text covering: what we collect (email, name,
+  phone, ZIP, project preferences via lead form; cart contents via
+  cookies; analytics via GTM/GA4/Clarity), where it goes (Payload
+  Postgres on Neon, GoHighLevel, Stripe, Resend, Microsoft Clarity), how
+  long we retain it, contact email for data requests.
+- 🔲 **Terms of service** — `/legal/terms` ditto.
+- 🔲 **Domain SPF / DKIM / DMARC** for Resend — required for transactional
+  emails to not land in spam and to prevent spoofing.
+- 🔲 **HSTS preload submission** — once you've been serving HSTS in prod
+  for 30+ days, submit to <https://hstspreload.org> so Chrome and others
+  hard-code HTTPS for the domain.
+- 🔲 **Rotate `PAYLOAD_SECRET`** if it's ever leaked. Generated with
+  `openssl rand -base64 32`. Rotation invalidates all existing admin sessions.
+- 🔲 **Upgrade in-memory rate limit → Upstash Redis** when first instance
+  of distributed abuse appears, OR proactively before any marketing
+  campaign that could 100x traffic. Add `UPSTASH_REDIS_REST_URL` +
+  `UPSTASH_REDIS_REST_TOKEN`, swap the implementation inside
+  `src/lib/rateLimit.ts`.
+- 🔲 **Content Security Policy** — deferred to Week 12 because Payload
+  admin + GTM + Calendly all inline-load scripts. Plan: nonce-based CSP
+  in `next.config.ts` headers + `middleware`-generated `Nonce` injected
+  into every `<script>`. Adds significant complexity for marginal real-
+  world benefit; revisit if the site ever serves user-generated HTML.
+- 🔲 **Quarterly OWASP review** — re-run the audit when a new dependency
+  is added or a new public route ships.
+
+### Tests you can run before launch
+- Submit `/consultation` six times in a row from one browser. The 6th
+  should bounce with `429 Too Many Requests`. Refresh in a minute and
+  it works again.
+- Open browser devtools → Network → check every page response for these
+  headers: `Strict-Transport-Security`, `X-Content-Type-Options`,
+  `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`.
+- Visit `view-source:` on the parent home page — search for
+  `STRIPE_SECRET`, `GHL_API`, `PAYLOAD_SECRET`, `DATABASE_URL`. None
+  should appear in the source.
+- Try `curl https://silverlineind.com/api/checkout -X POST -d '{}'` 11
+  times in a row from one IP. The 11th should return `429`.
+- Try to load `/dashboard` in an incognito window. Should 307-redirect to
+  `/admin/login?redirect=/dashboard`.
+
+---
+
 ## 11. 🟢 SEO + indexing
 
 - [ ] Submit sitemap to Google: <https://silverlineind.com/sitemap.xml> in Search Console

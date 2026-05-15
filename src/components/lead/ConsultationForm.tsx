@@ -99,6 +99,29 @@ export function ConsultationForm({
       onSubmit={handleSubmit}
       className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-panel)] p-6 md:p-10"
     >
+      {/* Honeypot — invisible to humans, irresistible to dumb bots.
+          Wrapped in <div aria-hidden> with `tabindex=-1` and off-screen
+          positioning so screen readers and keyboard users never see it. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          left: "-10000px",
+          width: 1,
+          height: 1,
+          overflow: "hidden",
+        }}
+      >
+        <label htmlFor="website-url-bot-trap">Website (leave blank)</label>
+        <input
+          id="website-url-bot-trap"
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       {/* Section: Contact */}
       <Section title="Contact details" first>
         <Field label="Name" htmlFor="name" error={errors.name}>
