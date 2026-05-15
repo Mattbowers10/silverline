@@ -14,6 +14,7 @@ import { Team } from "./payload/collections/Team";
 import { Products } from "./payload/collections/Products";
 import { Pages } from "./payload/collections/Pages";
 import { Leads } from "./payload/collections/Leads";
+import { Orders } from "./payload/collections/Orders";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -38,6 +39,7 @@ export default buildConfig({
     Testimonials,
     Team,
     Products,
+    Orders,
     Leads,
     Media,
     Users,
