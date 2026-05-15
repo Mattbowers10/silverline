@@ -2,12 +2,19 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 /**
  * Sticky bottom-right "Request consultation" pill that appears after 25%
  * scroll on long pages. Dismissible per-session via sessionStorage.
+ * Hidden on /consultation (redundant) and any /shop/checkout-ish path.
  */
+const HIDDEN_PREFIXES = ["/consultation", "/shop/cart", "/shop/success"];
+
 export function FloatingCTA() {
+  const pathname = usePathname() ?? "";
+  const hiddenForRoute = HIDDEN_PREFIXES.some((p) => pathname.startsWith(p));
+
   const [visible, setVisible] = React.useState(false);
   const [dismissed, setDismissed] = React.useState(false);
 
@@ -28,7 +35,7 @@ export function FloatingCTA() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  if (dismissed) return null;
+  if (dismissed || hiddenForRoute) return null;
 
   return (
     <div

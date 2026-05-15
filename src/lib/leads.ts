@@ -3,6 +3,7 @@ import { getPayload } from "payload";
 import config from "@payload-config";
 import { createGHLContact, type GHLResult } from "./ghl";
 import { checkServiceArea } from "./serviceArea";
+import { sendEmail } from "./email";
 
 export const LeadSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -104,6 +105,27 @@ export async function createLead(raw: unknown): Promise<LeadResult> {
     });
   }
   // skipped → leave as pending; admin can review
+
+  // 4. Fire confirmation email (graceful no-op if Resend not configured).
+  //    Newsletter signups skip the confirmation — they get a marketing
+  //    welcome via GHL workflow instead.
+  if (input.source !== "newsletter") {
+    void sendEmail({
+      to: input.email,
+      subject: "We received your Silverline inquiry",
+      text:
+        `Hi${input.name ? " " + input.name.split(" ")[0] : ""},\n\n` +
+        `Thanks for reaching out to Silverline. A real team member is reviewing the details below and will be back to you within one business day.\n\n` +
+        `What you shared:\n` +
+        `· Division: ${input.division ?? "—"}\n` +
+        `· Budget band: ${input.budgetBand ?? "—"}\n` +
+        `· Timeline: ${input.timeline ?? "—"}\n` +
+        `· ZIP: ${input.zip ?? "—"}\n\n` +
+        `If you need to add anything, just reply to this email.\n\n` +
+        `— The Silverline team`,
+      replyTo: "hello@silverlineind.com",
+    });
+  }
 
   return {
     ok: true,

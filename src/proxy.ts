@@ -60,8 +60,11 @@ export function proxy(req: NextRequest) {
   const tenant = tenantFromHost(host);
   const path = url.pathname;
 
-  // Don't rewrite Payload routes, static assets, or Next internals.
-  const isPayload =
+  // Don't rewrite already-internal paths (`/s/<tenant>/…`), Payload routes,
+  // static assets, or Next internals. Crawlers that hit Next-generated URLs
+  // like `/s/parent/opengraph-image-…` must pass through unchanged.
+  const passThrough =
+    path.startsWith("/s/") ||
     path.startsWith("/admin") ||
     path.startsWith("/api/") ||
     path.startsWith("/_next") ||
@@ -70,7 +73,7 @@ export function proxy(req: NextRequest) {
     path === "/sitemap.xml" ||
     path === "/robots.txt";
 
-  if (isPayload) {
+  if (passThrough) {
     const res = NextResponse.next();
     res.headers.set("x-silverline-tenant", tenant);
     return res;

@@ -16,6 +16,9 @@ import {
 } from "@/components/sections";
 import { HeroComposite } from "@/components/site/HeroComposite";
 import { buildMetadata } from "@/lib/seo";
+import { listPosts, CATEGORY_LABEL, formatPubDate } from "@/lib/posts";
+
+export const revalidate = 60;
 
 export const metadata = buildMetadata({
   title: "Silverline — Custom Homes, Pools, and Properties in East Tennessee",
@@ -31,7 +34,54 @@ export const metadata = buildMetadata({
  * placeholder until the brand pass / photography drop lands. Each section
  * is a self-contained component; swap props as content is finalized.
  */
-export default function ParentHome() {
+const PLACEHOLDER_POSTS = [
+  {
+    title: "Gunite vs. fiberglass: the East Tennessee answer (placeholder)",
+    href: "/blog/gunite-vs-fiberglass",
+    category: "Pools",
+    publishedAt: "May 13, 2026",
+    readingMinutes: 12,
+  },
+  {
+    title: "Cost per square foot for custom homes in Knox County (placeholder)",
+    href: "/blog/cost-per-sqft-knox",
+    category: "Developments",
+    publishedAt: "May 11, 2026",
+    readingMinutes: 14,
+  },
+  {
+    title: "Short-term rental yields by zip in 2026 (placeholder)",
+    href: "/blog/str-yields-2026",
+    category: "Properties",
+    publishedAt: "May 9, 2026",
+    readingMinutes: 9,
+  },
+  {
+    title: "Pool maintenance schedules that actually work (placeholder)",
+    href: "/blog/pool-maintenance-schedules",
+    category: "Pools",
+    publishedAt: "May 7, 2026",
+    readingMinutes: 8,
+  },
+];
+
+export default async function ParentHome() {
+  // Pull the latest 4 published posts. Falls back to placeholders if none.
+  const livePosts = await listPosts({ limit: 4 });
+  const posts =
+    livePosts.length > 0
+      ? livePosts.map((p) => ({
+          title: p.title,
+          href: `/blog/${p.slug}`,
+          category: CATEGORY_LABEL[p.category],
+          publishedAt: formatPubDate(p.publishedAt),
+          readingMinutes: p.readingMinutes,
+          coverImage: p.coverImageUrl
+            ? { src: p.coverImageUrl, alt: p.coverImageAlt ?? p.title }
+            : undefined,
+        }))
+      : PLACEHOLDER_POSTS;
+
   return (
     <>
       <Hero
@@ -323,36 +373,7 @@ export default function ParentHome() {
         headline="Modern building insights."
         italicWord="building"
         sub="Project breakdowns, cost guides, and East Tennessee market reporting from the Silverline team."
-        posts={[
-          {
-            title: "Gunite vs. fiberglass: the East Tennessee answer (placeholder)",
-            href: "/blog/gunite-vs-fiberglass",
-            category: "Pools",
-            publishedAt: "May 13, 2026",
-            readingMinutes: 12,
-          },
-          {
-            title: "Cost per square foot for custom homes in Knox County (placeholder)",
-            href: "/blog/cost-per-sqft-knox",
-            category: "Developments",
-            publishedAt: "May 11, 2026",
-            readingMinutes: 14,
-          },
-          {
-            title: "Short-term rental yields by zip in 2026 (placeholder)",
-            href: "/blog/str-yields-2026",
-            category: "Properties",
-            publishedAt: "May 9, 2026",
-            readingMinutes: 9,
-          },
-          {
-            title: "Pool maintenance schedules that actually work (placeholder)",
-            href: "/blog/pool-maintenance-schedules",
-            category: "Pools",
-            publishedAt: "May 7, 2026",
-            readingMinutes: 8,
-          },
-        ]}
+        posts={posts}
       />
 
       <ProjectGallery

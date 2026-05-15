@@ -44,7 +44,7 @@ export function PostCard({
         <div className="flex items-center gap-3 text-[length:var(--text-13)] uppercase tracking-[0.18em] text-[var(--color-muted)]">
           <span className="text-[var(--color-accent)]">{CATEGORY_LABEL[post.category]}</span>
           <span aria-hidden>·</span>
-          <span>{formatPubDate(post.publishedAt)}</span>
+          <time dateTime={post.publishedAt}>{formatPubDate(post.publishedAt)}</time>
         </div>
         <h3
           className={`mt-3 font-display leading-snug tracking-tight ${

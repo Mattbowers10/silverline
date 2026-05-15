@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { NewsletterForm } from "./NewsletterForm";
 
 export function EmptyPosts({ category }: { category?: string }) {
   return (
@@ -19,15 +19,10 @@ export function EmptyPosts({ category }: { category?: string }) {
       </h2>
       <p className="mx-auto mt-4 max-w-xl text-[length:var(--text-15)] text-[var(--color-muted)]">
         We&apos;re shipping five posts a week starting this season — build guides, cost
-        breakdowns, and East Tennessee market reporting from the Silverline team. Subscribe
-        for the first drop.
+        breakdowns, and East Tennessee market reporting from the Silverline team. Drop
+        your email for the first drop.
       </p>
-      <Link
-        href="/contact?subject=Newsletter"
-        className="mt-6 inline-flex rounded-full bg-white px-5 py-3 text-[length:var(--text-15)] font-medium text-black transition-colors hover:bg-[var(--color-accent)]"
-      >
-        Subscribe for updates
-      </Link>
+      <NewsletterForm />
     </div>
   );
 }
