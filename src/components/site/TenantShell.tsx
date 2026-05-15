@@ -3,6 +3,7 @@ import { AnnouncementBar } from "./AnnouncementBar";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { SkipLink } from "./SkipLink";
+import { FloatingCTA } from "./FloatingCTA";
 
 /** Wraps every tenant page tree with the shared chrome. */
 export function TenantShell({
@@ -25,6 +26,7 @@ export function TenantShell({
         {children}
       </main>
       <Footer tenant={tenant} />
+      <FloatingCTA />
     </>
   );
 }

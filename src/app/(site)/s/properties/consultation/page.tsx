@@ -1,4 +1,4 @@
-import { PagePlaceholder } from "@/components/site/PagePlaceholder";
+import { ConsultationForm } from "@/components/lead/ConsultationForm";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
@@ -8,18 +8,32 @@ export const metadata = buildMetadata({
   path: "/consultation",
 });
 
-export default function PropertiesConsultationPage() {
+type Args = { searchParams: Promise<{ email?: string }> };
+
+export default async function PropertiesConsultationPage({ searchParams }: Args) {
+  const { email } = await searchParams;
   return (
-    <PagePlaceholder
-      eyebrow="Property consultation"
-      title="A few questions. Then we strategize."
-      italicWord="strategize."
-      description="The multi-step intake form (goals, geography, budget band) lands in Week 8. Until then, email us with your property goals."
-      links={[
-        { label: "Contact the properties team", href: "https://silverlineind.com/contact?subject=Property%20inquiry" },
-        { label: "Check the service area", href: "https://silverlineind.com/service-area" },
-        { label: "STR ROI calculator", href: "/calculators/str-roi" },
-      ]}
-    />
+    <section className="px-6 py-20 lg:py-28">
+      <div className="mx-auto max-w-3xl">
+        <header className="mb-12 text-center">
+          <p className="mb-5 text-[length:var(--text-13)] uppercase tracking-[0.22em] text-[var(--color-muted)]">
+            Property consultation
+          </p>
+          <h1 className="font-display text-balance text-[length:var(--text-48)] leading-[1.05] tracking-tight md:text-[length:var(--text-64)]">
+            A few questions. Then we{" "}
+            <i className="font-display italic text-[var(--color-accent)]">strategize.</i>
+          </h1>
+          <p className="mx-auto mt-6 max-w-xl text-pretty text-[length:var(--text-18)] text-[var(--color-muted)]">
+            We reply to every property inquiry within one business day. A real Silverline
+            property advisor reads every word.
+          </p>
+        </header>
+        <ConsultationForm
+          source="consultation_properties"
+          defaultDivision="properties"
+          defaultEmail={email}
+        />
+      </div>
+    </section>
   );
 }

@@ -54,7 +54,7 @@ export function CTABand({
         {emailCapture ? (
           <form
             action={emailCapture.action ?? "/consultation"}
-            method="post"
+            method="get"
             className="mx-auto mt-10 flex max-w-md items-center rounded-full border border-[var(--color-line)] bg-[var(--color-panel)]/60 p-1"
           >
             <input

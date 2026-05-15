@@ -1,4 +1,4 @@
-import { PagePlaceholder } from "@/components/site/PagePlaceholder";
+import { ConsultationForm } from "@/components/lead/ConsultationForm";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
@@ -8,17 +8,30 @@ export const metadata = buildMetadata({
   path: "/consultation",
 });
 
-export default function ConsultationPage() {
+type Args = { searchParams: Promise<{ email?: string }> };
+
+export default async function ConsultationPage({ searchParams }: Args) {
+  const { email } = await searchParams;
+
   return (
-    <PagePlaceholder
-      eyebrow="Request consultation"
-      title="A few questions. Then we talk."
-      italicWord="talk."
-      description="The multi-step intake form lands in Week 8 with ZIP validation, project type, and budget bands. Until then, drop us a note via contact."
-      links={[
-        { label: "Contact us directly", href: "/contact" },
-        { label: "Check the service area first", href: "/service-area" },
-      ]}
-    />
+    <section className="px-6 py-20 lg:py-28">
+      <div className="mx-auto max-w-3xl">
+        <header className="mb-12 text-center">
+          <p className="mb-5 text-[length:var(--text-13)] uppercase tracking-[0.22em] text-[var(--color-muted)]">
+            Request consultation
+          </p>
+          <h1 className="font-display text-balance text-[length:var(--text-48)] leading-[1.05] tracking-tight md:text-[length:var(--text-64)]">
+            A few questions. Then we{" "}
+            <i className="font-display italic text-[var(--color-accent)]">talk.</i>
+          </h1>
+          <p className="mx-auto mt-6 max-w-xl text-pretty text-[length:var(--text-18)] text-[var(--color-muted)]">
+            We reply to every consultation within one business day. A real human reads
+            every word.
+          </p>
+        </header>
+
+        <ConsultationForm source="consultation_parent" defaultEmail={email} />
+      </div>
+    </section>
   );
 }
