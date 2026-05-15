@@ -1,11 +1,20 @@
 import type { CollectionConfig } from "payload";
 
+export const LEAD_STATUSES = [
+  { label: "New", value: "new" },
+  { label: "Contacted", value: "contacted" },
+  { label: "Consultation booked", value: "consultation_booked" },
+  { label: "Proposal sent", value: "proposal" },
+  { label: "Won", value: "won" },
+  { label: "Lost", value: "lost" },
+] as const;
+
 export const Leads: CollectionConfig = {
   slug: "leads",
   admin: {
     useAsTitle: "email",
-    defaultColumns: ["email", "source", "division", "budgetBand", "createdAt"],
-    description: "Mirror of leads sent to GoHighLevel for audit/recovery",
+    defaultColumns: ["email", "status", "source", "division", "budgetBand", "createdAt"],
+    description: "Lead inbox — mirrored to GoHighLevel and worked from /dashboard/leads",
   },
   access: {
     read: ({ req: { user } }) => Boolean(user),
@@ -43,6 +52,34 @@ export const Leads: CollectionConfig = {
       type: "text",
       admin: { description: "e.g. hero_parent, calc_gunite, exit_intent_pools" },
     },
+
+    /* ─── Pipeline status ────────────────────────────────────────────── */
+    {
+      name: "status",
+      type: "select",
+      defaultValue: "new",
+      required: true,
+      options: LEAD_STATUSES as unknown as { label: string; value: string }[],
+      admin: { description: "Sales pipeline stage — updated from /dashboard/leads/[id]" },
+    },
+    {
+      name: "statusChangedAt",
+      type: "date",
+      admin: { description: "Auto-stamped when status changes" },
+    },
+    {
+      name: "notes",
+      type: "array",
+      labels: { singular: "Note", plural: "Notes" },
+      admin: { description: "Internal sales notes" },
+      fields: [
+        { name: "body", type: "textarea", required: true },
+        { name: "author", type: "text" },
+        { name: "createdAt", type: "date" },
+      ],
+    },
+
+    /* ─── GHL sync ──────────────────────────────────────────────────── */
     {
       name: "ghlSyncStatus",
       type: "select",
@@ -55,4 +92,5 @@ export const Leads: CollectionConfig = {
     },
     { name: "ghlContactId", type: "text" },
   ],
+  timestamps: true,
 };

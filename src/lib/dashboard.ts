@@ -64,8 +64,18 @@ export type LeadRow = {
   budgetBand?: string;
   timeline?: string;
   source?: string;
+  message?: string;
+  status: string;
+  statusChangedAt?: string;
   outOfServiceArea: boolean;
   ghlSyncStatus: string;
+  ghlContactId?: string;
+};
+
+export type LeadNote = {
+  body: string;
+  author?: string;
+  createdAt?: string;
 };
 
 export type OrderRow = {
@@ -270,8 +280,12 @@ function toLeadRow(doc: Record<string, unknown>): LeadRow {
     budgetBand: doc.budgetBand ? String(doc.budgetBand) : undefined,
     timeline: doc.timeline ? String(doc.timeline) : undefined,
     source: doc.source ? String(doc.source) : undefined,
+    message: doc.message ? String(doc.message) : undefined,
+    status: String(doc.status ?? "new"),
+    statusChangedAt: doc.statusChangedAt ? String(doc.statusChangedAt) : undefined,
     outOfServiceArea: Boolean(doc.outOfServiceArea),
     ghlSyncStatus: String(doc.ghlSyncStatus ?? "pending"),
+    ghlContactId: doc.ghlContactId ? String(doc.ghlContactId) : undefined,
   };
 }
 
@@ -291,4 +305,127 @@ function toOrderRow(doc: Record<string, unknown>): OrderRow {
 export function deltaPct(curr: number, prev: number): number | null {
   if (prev === 0) return null;
   return Math.round(((curr - prev) / prev) * 100);
+}
+
+/* ---------- Pipeline counts (used by /dashboard top strip + leads page) ---------- */
+
+export type PipelineCounts = Record<string, number>;
+
+export async function loadPipelineCounts(): Promise<PipelineCounts> {
+  try {
+    const payload = await getPayload({ config });
+    const statuses = ["new", "contacted", "consultation_booked", "proposal", "won", "lost"];
+    const counts: PipelineCounts = {};
+    await Promise.all(
+      statuses.map(async (s) => {
+        const res = await payload.find({
+          collection: "leads",
+          where: { status: { equals: s } } as Where,
+          limit: 1,
+          depth: 0,
+        });
+        counts[s] = res.totalDocs ?? 0;
+      }),
+    );
+    return counts;
+  } catch {
+    return {};
+  }
+}
+
+/* ---------- Lead list query (filters + pagination) ---------- */
+
+export type LeadListFilters = {
+  status?: string;
+  division?: string;
+  source?: string;
+  inArea?: "in" | "out";
+  q?: string;
+  page?: number;
+  perPage?: number;
+};
+
+export type LeadListResult = {
+  leads: LeadRow[];
+  totalDocs: number;
+  totalPages: number;
+  page: number;
+  perPage: number;
+};
+
+export async function loadLeadsList(filters: LeadListFilters): Promise<LeadListResult> {
+  try {
+    const payload = await getPayload({ config });
+    const page = Math.max(1, Math.floor(filters.page ?? 1));
+    const perPage = Math.max(10, Math.min(100, Math.floor(filters.perPage ?? 25)));
+
+    const and: Where[] = [];
+    if (filters.status) and.push({ status: { equals: filters.status } } as Where);
+    if (filters.division) and.push({ division: { equals: filters.division } } as Where);
+    if (filters.source) and.push({ source: { contains: filters.source } } as Where);
+    if (filters.inArea === "in") and.push({ outOfServiceArea: { equals: false } } as Where);
+    if (filters.inArea === "out") and.push({ outOfServiceArea: { equals: true } } as Where);
+    if (filters.q) {
+      const q = filters.q;
+      and.push({
+        or: [
+          { email: { contains: q } },
+          { name: { contains: q } },
+          { phone: { contains: q } },
+          { zip: { contains: q } },
+        ],
+      } as Where);
+    }
+
+    const where: Where = and.length > 0 ? { and } : {};
+
+    const res = await payload.find({
+      collection: "leads",
+      where,
+      sort: "-createdAt",
+      page,
+      limit: perPage,
+      depth: 0,
+    });
+
+    return {
+      leads: (res.docs as unknown as Array<Record<string, unknown>>).map(toLeadRow),
+      totalDocs: res.totalDocs ?? 0,
+      totalPages: res.totalPages ?? 1,
+      page: res.page ?? page,
+      perPage,
+    };
+  } catch {
+    return { leads: [], totalDocs: 0, totalPages: 1, page: 1, perPage: 25 };
+  }
+}
+
+/* ---------- Single lead (detail) ---------- */
+
+export type LeadDetail = {
+  lead: LeadRow;
+  notes: LeadNote[];
+};
+
+export async function loadLeadDetail(id: string): Promise<LeadDetail | null> {
+  try {
+    const payload = await getPayload({ config });
+    const doc = (await payload.findByID({
+      collection: "leads",
+      id,
+      depth: 0,
+    })) as unknown as Record<string, unknown>;
+    if (!doc) return null;
+    const notesRaw = Array.isArray(doc.notes) ? (doc.notes as LeadNote[]) : [];
+    return {
+      lead: toLeadRow(doc),
+      notes: notesRaw.map((n) => ({
+        body: String(n.body ?? ""),
+        author: n.author ? String(n.author) : undefined,
+        createdAt: n.createdAt ? String(n.createdAt) : undefined,
+      })),
+    };
+  } catch {
+    return null;
+  }
 }

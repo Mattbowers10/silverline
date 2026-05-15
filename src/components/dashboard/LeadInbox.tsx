@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { EmptyNudge } from "./EmptyNudge";
+import { LeadStatusBadge } from "./LeadStatusBadge";
 import type { LeadRow } from "@/lib/dashboard";
 
 const DIVISION_LABEL: Record<string, string> = {
@@ -36,7 +37,7 @@ export function LeadInbox({ leads }: { leads: LeadRow[] }) {
       <EmptyNudge
         title="No leads yet in this window."
         body="When a visitor fills the hero pill, the consultation form, or unlocks a calculator, it lands here."
-        cta={{ label: "Open all leads in CMS", href: "/admin/collections/leads" }}
+        cta={{ label: "Open all leads", href: "/dashboard/leads" }}
       />
     );
   }
@@ -46,10 +47,10 @@ export function LeadInbox({ leads }: { leads: LeadRow[] }) {
       {leads.map((l) => (
         <li key={l.id}>
           <Link
-            href={`/admin/collections/leads/${l.id}`}
+            href={`/dashboard/leads/${l.id}`}
             className="grid grid-cols-12 items-center gap-4 px-4 py-3.5 transition-colors hover:bg-white/[0.02] md:gap-6"
           >
-            <div className="col-span-12 md:col-span-4">
+            <div className="col-span-12 md:col-span-3">
               <p className="text-[length:var(--text-15)] text-[var(--color-text)]">
                 {l.name || l.email.split("@")[0]}
               </p>
@@ -59,7 +60,8 @@ export function LeadInbox({ leads }: { leads: LeadRow[] }) {
               </p>
             </div>
 
-            <div className="col-span-8 flex flex-wrap items-center gap-1.5 md:col-span-6">
+            <div className="col-span-8 flex flex-wrap items-center gap-1.5 md:col-span-7">
+              <LeadStatusBadge status={l.status} />
               {l.division ? (
                 <Chip>{DIVISION_LABEL[l.division] ?? l.division}</Chip>
               ) : null}

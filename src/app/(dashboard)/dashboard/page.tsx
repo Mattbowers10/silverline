@@ -1,6 +1,13 @@
+import Link from "next/link";
 import { requireUser } from "@/lib/auth";
-import { deltaPct, loadDashboard, resolveRange } from "@/lib/dashboard";
+import {
+  deltaPct,
+  loadDashboard,
+  loadPipelineCounts,
+  resolveRange,
+} from "@/lib/dashboard";
 import { formatPrice } from "@/lib/stripe";
+import { LEAD_STATUSES } from "@/payload/collections/Leads";
 import { DashboardChrome } from "@/components/dashboard/DashboardChrome";
 import { KpiCard } from "@/components/dashboard/KpiCard";
 import { RangePicker } from "@/components/dashboard/RangePicker";
@@ -25,6 +32,7 @@ export default async function DashboardPage({ searchParams }: Args) {
 
   const newLeadsDelta = deltaPct(data.kpis.newLeads, data.kpis.newLeadsPrev);
   const range = resolveRange(rangeParam);
+  const pipeline = await loadPipelineCounts();
 
   return (
     <DashboardChrome user={user}>
@@ -80,18 +88,36 @@ export default async function DashboardPage({ searchParams }: Args) {
         />
       </section>
 
+      {/* Pipeline rollup */}
+      <section className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        {LEAD_STATUSES.map((s) => (
+          <Link
+            key={s.value}
+            href={`/dashboard/leads?status=${s.value}`}
+            className="rounded-xl border border-[var(--color-line)] bg-[var(--color-panel)]/60 p-4 transition-colors hover:border-[var(--color-accent)]/40"
+          >
+            <p className="text-[length:var(--text-13)] uppercase tracking-[0.18em] text-[var(--color-muted)]">
+              {s.label}
+            </p>
+            <p className="mt-2 font-display text-[length:var(--text-32)] leading-none tracking-tight">
+              {pipeline[s.value] ?? 0}
+            </p>
+          </Link>
+        ))}
+      </section>
+
       {/* Lead inbox */}
       <section className="mt-10 card-highlight rounded-2xl border border-[var(--color-line)]">
         <header className="flex items-center justify-between border-b border-[var(--color-line)] px-5 py-4">
           <h2 className="text-[length:var(--text-13)] uppercase tracking-[0.22em] text-[var(--color-muted)]">
             Lead inbox · {data.leads.length} in window
           </h2>
-          <a
-            href="/admin/collections/leads"
+          <Link
+            href="/dashboard/leads"
             className="text-[length:var(--text-13)] text-[var(--color-muted)] transition-colors hover:text-[var(--color-accent)]"
           >
             All leads →
-          </a>
+          </Link>
         </header>
         <LeadInbox leads={data.leads} />
       </section>

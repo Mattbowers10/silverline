@@ -69,6 +69,8 @@ export async function createLead(raw: unknown): Promise<LeadResult> {
       message: input.message || undefined,
       source: input.source,
       outOfServiceArea,
+      status: "new",
+      statusChangedAt: new Date().toISOString(),
       ghlSyncStatus: "pending",
     },
   });
